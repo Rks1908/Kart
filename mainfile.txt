@@ -1,1 +1,40 @@
 1st commit
+
+pipeline {
+    agent any // Specifies where the entire pipeline will run (any available agent)
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building the application...'
+                sh 'make build' // Executes a shell command to build the project
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                sh 'make check' // Executes shell commands to run tests
+                junit 'reports/**/*.xml' // Archives JUnit test reports (requires JUnit plugin)
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying the application...'
+                sh 'make publish' // Executes shell commands to publish the application
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline finished.'
+        }
+        success {
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Pipeline failed, sending notification...'
+            // Example for email notification (requires Email-ext Plugin)
+            // emailext (to: 'me@example.com', subject: "FAILURE: ${env.JOB_NAME}", body: "Build URL: ${env.BUILD_URL}")
+        }
+    }
+}
+
